@@ -1,8 +1,8 @@
+// components/UniversalButton.tsx
 import React from 'react';
 import { TouchableOpacity, Text, StyleSheet, GestureResponderEvent } from 'react-native';
 
-// Definisikan tipe untuk props UniversalButton
-interface UniversalButtonProps {
+export interface UniversalButtonProps {
   title: string;
   onPress: (event: GestureResponderEvent) => void;
   backgroundColor?: string;
@@ -10,6 +10,7 @@ interface UniversalButtonProps {
   width?: number;
   height?: number;
   fontSize?: number;
+  disabled?: boolean;
 }
 
 const UniversalButton: React.FC<UniversalButtonProps> = ({
@@ -20,13 +21,20 @@ const UniversalButton: React.FC<UniversalButtonProps> = ({
   width = 160,
   height = 50,
   fontSize = 16,
+  disabled = false,
 }) => {
   return (
     <TouchableOpacity
       onPress={onPress}
+      disabled={disabled}
       style={[
         styles.button,
-        { backgroundColor, width, height },
+        { 
+          backgroundColor: disabled ? '#cccccc' : backgroundColor, 
+          width, 
+          height,
+          opacity: disabled ? 0.7 : 1
+        },
       ]}
     >
       <Text style={[styles.text, { color: textColor, fontSize }]}>
@@ -45,7 +53,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.2,
     shadowOffset: { width: 0, height: 2 },
     shadowRadius: 4,
-    elevation: 3, // Untuk memberikan efek shadow di Android
+    elevation: 3,
   },
   text: {
     fontWeight: 'bold',

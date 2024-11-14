@@ -1,48 +1,35 @@
 // components/AuthInput.tsx
-import React from "react";
-import { TextInput, View, Text } from "react-native";
-import { Feather } from "@expo/vector-icons";
-import { Poppins_400Regular } from "@expo-google-fonts/poppins";
+import React from 'react';
+import { View, TextInput, TextInputProps } from 'react-native';
+import { Feather } from '@expo/vector-icons';
 
-interface AuthInputProps {
+export interface AuthInputProps extends TextInputProps {
   icon: keyof typeof Feather.glyphMap;
   placeholder: string;
   value: string;
   onChangeText: (text: string) => void;
-  secureTextEntry?: boolean;
-  error?: string;
 }
 
-export default function AuthInput({
+const AuthInput: React.FC<AuthInputProps> = ({
   icon,
   placeholder,
   value,
   onChangeText,
-  secureTextEntry = false,
-  error,
-}: AuthInputProps) {
+  ...props
+}) => {
   return (
-    <View className="mb-4">
-      <View className="flex-row items-center border-2 border-gray-200 rounded-xl px-4 h-14">
-        <Feather name={icon} size={20} color="#0C8EEC" />
-        <TextInput
-          style={{ fontFamily: "Poppins_400Regular" }}
-          className="flex-1 ml-3 text-gray-800"
-          placeholder={placeholder}
-          placeholderTextColor="#9CA3AF"
-          value={value}
-          onChangeText={onChangeText}
-          secureTextEntry={secureTextEntry}
-        />
-      </View>
-      {error && (
-        <Text
-          style={{ fontFamily: "Poppins_400Regular" }}
-          className="text-red-500 text-sm mt-1"
-        >
-          {error}
-        </Text>
-      )}
+    <View className="flex-row items-center bg-gray-100 rounded-xl px-4 py-3 mb-4">
+      <Feather name={icon} size={20} color="#666" />
+      <TextInput
+        className="flex-1 pl-3 text-base text-gray-800"
+        placeholder={placeholder}
+        placeholderTextColor="#666"
+        value={value}
+        onChangeText={onChangeText}
+        {...props}
+      />
     </View>
   );
-}
+};
+
+export default AuthInput;

@@ -72,7 +72,7 @@ export default function Register() {
         <View className="p-6">
           <Animated.View
             entering={FadeInDown.duration(1000).springify()}
-            className="mt-20"
+            className="mt-10"
           >
             <Text className="text-3xl mb-2 font-bold">
               <Text style={{ color: "#A92394" }}>Daftar </Text>

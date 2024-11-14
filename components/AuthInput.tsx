@@ -1,35 +1,49 @@
 // components/AuthInput.tsx
-import React from 'react';
-import { View, TextInput, TextInputProps } from 'react-native';
+import React, { useState } from 'react';
+import { View, TextInput, TouchableOpacity, TextInputProps } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 
-export interface AuthInputProps extends TextInputProps {
+interface AuthInputProps extends TextInputProps {
   icon: keyof typeof Feather.glyphMap;
   placeholder: string;
   value: string;
   onChangeText: (text: string) => void;
 }
 
-const AuthInput: React.FC<AuthInputProps> = ({
-  icon,
-  placeholder,
-  value,
+export default function AuthInput({ 
+  icon, 
+  placeholder, 
+  value, 
   onChangeText,
-  ...props
-}) => {
+  secureTextEntry,
+  ...props 
+}: AuthInputProps) {
+  const [isPasswordVisible, setIsPasswordVisible] = useState(false);
+
   return (
-    <View className="flex-row items-center bg-gray-100 rounded-xl px-4 py-3 mb-4">
+    <View className="flex-row items-center bg-gray-100 p-4 rounded-xl mb-4">
       <Feather name={icon} size={20} color="#666" />
       <TextInput
-        className="flex-1 pl-3 text-base text-gray-800"
+        className="flex-1 ml-3 text-gray-800"
         placeholder={placeholder}
         placeholderTextColor="#666"
         value={value}
         onChangeText={onChangeText}
+        secureTextEntry={secureTextEntry && !isPasswordVisible}
         {...props}
       />
+      {secureTextEntry && (
+        <TouchableOpacity
+          onPress={() => setIsPasswordVisible(!isPasswordVisible)}
+          className="ml-2"
+        >
+          <Feather
+            name={isPasswordVisible ? "eye-off" : "eye"}
+            size={20}
+            color="#666"
+          />
+        </TouchableOpacity>
+      )}
     </View>
   );
-};
-
-export default AuthInput;
+}

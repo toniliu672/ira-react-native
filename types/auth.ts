@@ -38,3 +38,12 @@ export interface ApiResponse<T> {
     phone?: string;
     address?: string;
   }
+
+  export interface AuthContextType {
+    user: User | null;
+    loading: boolean;
+    error: string | null;
+    login: (credentials: LoginRequest) => Promise<void>;
+    register: (data: RegisterRequest) => Promise<void>;
+    logout: () => Promise<void>;
+  }

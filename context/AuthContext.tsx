@@ -1,9 +1,15 @@
 // context/AuthContext.tsx
-import React, { createContext, useContext, useState, ReactNode } from 'react';
-import { router } from 'expo-router';
-import * as SecureStore from 'expo-secure-store';
-import { authService } from '../services/authService';
-import { User, LoginRequest, RegisterRequest } from '../types/auth';
+import React, {
+  createContext,
+  useContext,
+  useState,
+  ReactNode,
+  useEffect,
+} from "react";
+import { router } from "expo-router";
+import * as SecureStore from "expo-secure-store";
+import { authService } from "../services/authService";
+import { User, LoginRequest, RegisterRequest } from "../types/auth";
 
 interface AuthContextType {
   user: User | null;
@@ -18,30 +24,69 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isInitialized, setIsInitialized] = useState(false);
 
-  const storeTokens = async (accessToken: string, refreshToken: string) => {
-    await SecureStore.setItemAsync('accessToken', accessToken);
-    await SecureStore.setItemAsync('refreshToken', refreshToken);
+  useEffect(() => {
+    checkAuth();
+  }, []);
+
+  const checkAuth = async () => {
+    try {
+      const token = await SecureStore.getItemAsync("accessToken");
+      const userData = await SecureStore.getItemAsync("userData");
+
+      if (token && userData) {
+        setUser(JSON.parse(userData));
+        authService.setAuthToken(token);
+      }
+    } catch (error) {
+      console.error("Auth check failed:", error);
+    } finally {
+      setLoading(false);
+      setIsInitialized(true);
+    }
+  };
+
+  const storeUserData = async (accessToken: string, userData: User) => {
+    try {
+      await SecureStore.setItemAsync("accessToken", accessToken);
+      await SecureStore.setItemAsync("userData", JSON.stringify(userData));
+      authService.setAuthToken(accessToken);
+    } catch (error) {
+      console.error("Failed to store user data:", error);
+      throw error;
+    }
   };
 
   const login = async (credentials: LoginRequest) => {
     try {
       setLoading(true);
       setError(null);
-      
+
       const response = await authService.login(credentials);
-      
+
       if (!response.success || !response.data) {
-        throw new Error(response.message || 'Login failed');
+        throw new Error(response.message || "Login failed");
       }
 
-      await storeTokens(response.data.accessToken, response.data.refreshToken);
-      setUser(response.data.user);
-      router.replace('/');
+      const { accessToken, user: userData } = response.data;
+
+      await storeUserData(accessToken, userData);
+      setUser(userData);
+
+      // Only navigate after initialization is complete
+      if (isInitialized) {
+        router.replace("/(tabs)/home");
+      }
     } catch (error) {
-      setError(error instanceof Error ? error.message : 'An error occurred');
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : "An error occurred during login";
+      setError(errorMessage);
+      throw error;
     } finally {
       setLoading(false);
     }
@@ -51,16 +96,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       setLoading(true);
       setError(null);
-      
+
       const response = await authService.register(data);
-      
+
       if (!response.success) {
-        throw new Error(response.message || 'Registration failed');
+        throw new Error(response.message || "Registration failed");
       }
 
-      router.replace('/login');
+      if (isInitialized) {
+        router.replace("/login");
+      }
     } catch (error) {
-      setError(error instanceof Error ? error.message : 'An error occurred');
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : "An error occurred during registration";
+      setError(errorMessage);
+      throw error;
     } finally {
       setLoading(false);
     }
@@ -68,28 +120,51 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const logout = async () => {
     try {
-      await authService.logout();
-    } catch (error) {
-      console.error('Logout error:', error);
-    } finally {
-      await SecureStore.deleteItemAsync('accessToken');
-      await SecureStore.deleteItemAsync('refreshToken');
+      setLoading(true);
+      setError(null);
+
+      await SecureStore.deleteItemAsync("accessToken");
+      await SecureStore.deleteItemAsync("userData");
+
+      try {
+        await authService.logout();
+      } catch (error) {
+        console.error("API logout failed:", error);
+      }
+
       setUser(null);
-      router.replace('/login');
+
+      if (isInitialized) {
+        router.replace("/(auth)/login");
+      }
+    } catch (error) {
+      console.error("Logout error:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
-  return (
-    <AuthContext.Provider value={{ user, loading, error, login, register, logout }}>
-      {children}
-    </AuthContext.Provider>
-  );
+  const value: AuthContextType = {
+    user,
+    loading,
+    error,
+    login,
+    register,
+    logout,
+  };
+
+  // Don't render children until initial auth check is complete
+  if (loading && !isInitialized) {
+    return null;
+  }
+
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 
 export function useAuth() {
   const context = useContext(AuthContext);
-  if (!context) {
-    throw new Error('useAuth must be used within AuthProvider');
+  if (context === undefined) {
+    throw new Error("useAuth must be used within AuthProvider");
   }
   return context;
 }

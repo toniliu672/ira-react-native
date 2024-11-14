@@ -1,9 +1,18 @@
 // app/(auth)/_layout.tsx
-import { Stack } from 'expo-router';
+import { Stack, router } from 'expo-router';
 import { View } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { useAuth } from '../../context/AuthContext';
 
 export default function AuthLayout() {
+  const { user } = useAuth();
+
+  // Redirect ke tabs jika user sudah login
+  if (user) {
+    router.replace('/(tabs)/home');
+    return null;
+  }
+
   return (
     <SafeAreaProvider>
       <View className="flex-1 bg-white">

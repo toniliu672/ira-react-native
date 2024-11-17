@@ -5,6 +5,13 @@ export interface APIResponse<T> {
     data?: T;
     error?: string;
   }
+
+  export interface ApiErrorResponse {
+    success: false;
+    message: string;
+    error?: string;
+  }
+  
   
   export interface LoginCredentials {
     email: string;

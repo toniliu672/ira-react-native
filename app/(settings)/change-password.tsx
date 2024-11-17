@@ -10,8 +10,11 @@ import {
 import { TextInput, Button, HelperText, Divider } from "react-native-paper";
 import { Stack, router } from "expo-router";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { AxiosError } from "axios";
 import api from "@/lib/api";
-import { ApiResponse } from "@/types/auth";
+import { ApiResponse, PasswordUpdateRequest } from "@/types/auth";
+import { ApiErrorResponse } from "@/types/api";
+import { API_CONFIG } from "@/lib/config";
 
 interface FormData {
   currentPassword: string;
@@ -19,51 +22,103 @@ interface FormData {
   confirmPassword: string;
 }
 
+interface PasswordVisibility {
+  current: boolean;
+  new: boolean;
+  confirm: boolean;
+}
+
 export default function ChangePasswordScreen() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [showPassword, setShowPassword] = useState<PasswordVisibility>({
+    current: false,
+    new: false,
+    confirm: false,
+  });
   const [formData, setFormData] = useState<FormData>({
     currentPassword: "",
     newPassword: "",
     confirmPassword: "",
   });
 
-  const handleChangePassword = async () => {
+  const togglePasswordVisibility = (field: keyof PasswordVisibility) => {
+    setShowPassword((prev) => ({
+      ...prev,
+      [field]: !prev[field],
+    }));
+  };
+
+  const validateForm = (): boolean => {
     if (
       !formData.currentPassword ||
       !formData.newPassword ||
       !formData.confirmPassword
     ) {
       setError("Semua field harus diisi");
-      return;
+      return false;
     }
 
     if (formData.newPassword.length < 8) {
       setError("Password baru minimal 8 karakter");
-      return;
+      return false;
     }
 
     if (formData.newPassword !== formData.confirmPassword) {
       setError("Password baru tidak cocok");
-      return;
+      return false;
     }
+
+    return true;
+  };
+
+  const handleChangePassword = async () => {
+    if (!validateForm()) return;
 
     try {
       setLoading(true);
       setError(null);
 
-      const response = await api.put<ApiResponse<void>>("/users/me/password", {
+      const passwordData: PasswordUpdateRequest = {
         currentPassword: formData.currentPassword,
         newPassword: formData.newPassword,
-      });
+      };
+
+      const response = await api.put<ApiResponse<void>>(
+        API_CONFIG.ENDPOINTS.UPDATE_PASSWORD,
+        passwordData
+      );
 
       if (response.data.success) {
         router.back();
       } else {
         setError(response.data.message || "Gagal mengubah password");
       }
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Gagal mengubah password");
+    } catch (error) {
+      if (error instanceof AxiosError && error.response) {
+        const errorData = error.response.data as ApiErrorResponse;
+
+        switch (error.response.status) {
+          case 400:
+            setError(errorData.message || "Password saat ini tidak valid");
+            break;
+          case 401:
+            setError("Sesi anda telah berakhir. Silakan login kembali");
+            router.replace("/(auth)/login");
+            break;
+          case 429:
+            setError(
+              "Terlalu banyak percobaan. Silakan coba beberapa saat lagi"
+            );
+            break;
+          default:
+            setError(
+              errorData.message || "Terjadi kesalahan. Silakan coba lagi nanti"
+            );
+        }
+      } else {
+        setError("Terjadi kesalahan jaringan. Periksa koneksi anda");
+      }
     } finally {
       setLoading(false);
     }
@@ -74,11 +129,11 @@ export default function ChangePasswordScreen() {
       <Stack.Screen
         options={{
           title: "Ubah Password",
+          headerShown: true,
           headerStyle: { backgroundColor: "#FFFFFF" },
           headerTintColor: "#0C8EEC",
           headerShadowVisible: false,
           headerTitleStyle: {
-            fontFamily: "Gilroy-ExtraBold",
             fontSize: 18,
           },
         }}
@@ -108,10 +163,17 @@ export default function ChangePasswordScreen() {
                 onChangeText={(text) =>
                   setFormData((prev) => ({ ...prev, currentPassword: text }))
                 }
-                secureTextEntry
+                secureTextEntry={!showPassword.current}
                 activeUnderlineColor="#0C8EEC"
                 style={{ backgroundColor: "white" }}
                 left={<TextInput.Icon icon="lock" color="#0C8EEC" />}
+                right={
+                  <TextInput.Icon
+                    icon={showPassword.current ? "eye-off" : "eye"}
+                    color="#666"
+                    onPress={() => togglePasswordVisibility("current")}
+                  />
+                }
               />
 
               <Divider className="my-2" />
@@ -123,10 +185,17 @@ export default function ChangePasswordScreen() {
                 onChangeText={(text) =>
                   setFormData((prev) => ({ ...prev, newPassword: text }))
                 }
-                secureTextEntry
+                secureTextEntry={!showPassword.new}
                 activeUnderlineColor="#0C8EEC"
                 style={{ backgroundColor: "white" }}
                 left={<TextInput.Icon icon="lock-plus" color="#0C8EEC" />}
+                right={
+                  <TextInput.Icon
+                    icon={showPassword.new ? "eye-off" : "eye"}
+                    color="#666"
+                    onPress={() => togglePasswordVisibility("new")}
+                  />
+                }
               />
 
               <Divider className="my-2" />
@@ -138,10 +207,17 @@ export default function ChangePasswordScreen() {
                 onChangeText={(text) =>
                   setFormData((prev) => ({ ...prev, confirmPassword: text }))
                 }
-                secureTextEntry
+                secureTextEntry={!showPassword.confirm}
                 activeUnderlineColor="#0C8EEC"
                 style={{ backgroundColor: "white" }}
                 left={<TextInput.Icon icon="lock-check" color="#0C8EEC" />}
+                right={
+                  <TextInput.Icon
+                    icon={showPassword.confirm ? "eye-off" : "eye"}
+                    color="#666"
+                    onPress={() => togglePasswordVisibility("confirm")}
+                  />
+                }
               />
 
               {error && (

@@ -2,9 +2,11 @@
 import React, { useState } from "react";
 import { View, Text, ScrollView, TouchableOpacity, Alert } from "react-native";
 import { Portal, Dialog, Button } from "react-native-paper";
-import { useAuthState } from "@/hooks/useAuthState";
+import { useAuth } from "@/context/AuthContext";
 import { MaterialIcons, Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
+import api from "@/lib/api";
+import * as SecureStore from "expo-secure-store";
 import { authService } from "@/services/authService";
 
 interface SettingsItemProps {
@@ -46,19 +48,26 @@ const SettingsItem: React.FC<SettingsItemProps> = ({
 );
 
 export default function SettingsScreen() {
-  const { user } = useAuthState();
+  const { user, logout: contextLogout } = useAuth();
   const [showLogoutDialog, setShowLogoutDialog] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
   const handleLogout = async () => {
     try {
       setIsLoading(true);
-      setShowLogoutDialog(false);
+
       await authService.logout();
+      await contextLogout();
+
+      setShowLogoutDialog(false);
       router.replace("/(auth)/login");
     } catch (error) {
-      Alert.alert("Error", "Failed to logout. Please try again.");
-      console.error("Logout failed:", error);
+      console.error("Logout error:", error);
+      Alert.alert(
+        "Logout Gagal",
+        "Terjadi kesalahan saat mencoba keluar. Silakan coba lagi.",
+        [{ text: "OK" }]
+      );
     } finally {
       setIsLoading(false);
     }
@@ -146,7 +155,7 @@ export default function SettingsScreen() {
       <Portal>
         <Dialog
           visible={showLogoutDialog}
-          onDismiss={() => setShowLogoutDialog(false)}
+          onDismiss={() => !isLoading && setShowLogoutDialog(false)}
         >
           <Dialog.Title>Konfirmasi Keluar</Dialog.Title>
           <Dialog.Content>
@@ -165,6 +174,7 @@ export default function SettingsScreen() {
               onPress={handleLogout}
               loading={isLoading}
               textColor="#DC2626"
+              disabled={isLoading}
             >
               Keluar
             </Button>

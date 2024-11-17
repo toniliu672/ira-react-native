@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "I-RA App",
-    "slug": "I-RA App",
+    "name": "IRAApp",
+    "slug": "IRAApp",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
@@ -19,7 +19,8 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.toniliu673.IRAApp"
     },
     "web": {
       "bundler": "metro",
@@ -33,6 +34,14 @@
     ],
     "experiments": {
       "typedRoutes": true
+    },
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "896becbc-c8b5-407f-8ee2-a953f20b23aa"
+      }
     }
   }
 }

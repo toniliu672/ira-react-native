@@ -3,13 +3,19 @@ import { Stack, router } from 'expo-router';
 import { View } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { useAuth } from '../../context/AuthContext';
+import { useEffect } from 'react';
 
 export default function AuthLayout() {
   const { user } = useAuth();
 
-  // Redirect ke tabs jika user sudah login
+  useEffect(() => {
+    if (user) {
+      router.replace('/(tabs)/home');
+    }
+  }, [user]);
+
+  // Jika user ada, tetap render null tapi biarkan useEffect yang handle redirectnya
   if (user) {
-    router.replace('/(tabs)/home');
     return null;
   }
 

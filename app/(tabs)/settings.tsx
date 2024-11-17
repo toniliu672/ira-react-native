@@ -1,9 +1,11 @@
 // app/(tabs)/settings.tsx
-import React, { useState } from 'react';
-import { View, Text, ScrollView, TouchableOpacity } from 'react-native';
-import { Portal, Dialog, Button } from 'react-native-paper';
-import { useAuth } from '@/context/AuthContext';
-import { MaterialIcons, Ionicons } from '@expo/vector-icons';
+import React, { useState } from "react";
+import { View, Text, ScrollView, TouchableOpacity, Alert } from "react-native";
+import { Portal, Dialog, Button } from "react-native-paper";
+import { useAuthState } from "@/hooks/useAuthState";
+import { MaterialIcons, Ionicons } from "@expo/vector-icons";
+import { router } from "expo-router";
+import { authService } from "@/services/authService";
 
 interface SettingsItemProps {
   icon: keyof typeof Ionicons.glyphMap;
@@ -20,82 +22,113 @@ const SettingsItem: React.FC<SettingsItemProps> = ({
   subtitle,
   onPress,
   color = "#0C8EEC",
-  showChevron = true
+  showChevron = true,
 }) => (
-  <TouchableOpacity 
+  <TouchableOpacity
     onPress={onPress}
     className="flex-row items-center p-4 bg-white mb-0.5"
+    activeOpacity={0.7}
   >
-    <View style={{ backgroundColor: `${color}15` }} className="w-10 h-10 rounded-full items-center justify-center mr-4">
+    <View
+      style={{ backgroundColor: `${color}15` }}
+      className="w-10 h-10 rounded-full items-center justify-center mr-4"
+    >
       <Ionicons name={icon} size={20} color={color} />
     </View>
     <View className="flex-1">
       <Text className="text-gray-800 text-base font-medium">{title}</Text>
       {subtitle && <Text className="text-gray-500 text-sm">{subtitle}</Text>}
     </View>
-    {showChevron && <MaterialIcons name="chevron-right" size={24} color="#CBD5E1" />}
+    {showChevron && (
+      <MaterialIcons name="chevron-right" size={24} color="#CBD5E1" />
+    )}
   </TouchableOpacity>
 );
 
 export default function SettingsScreen() {
-  const { user, logout } = useAuth();
+  const { user } = useAuthState();
   const [showLogoutDialog, setShowLogoutDialog] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleLogout = async () => {
     try {
+      setIsLoading(true);
       setShowLogoutDialog(false);
-      await logout();
+      await authService.logout();
+      router.replace("/(auth)/login");
     } catch (error) {
-      console.error('Logout failed:', error);
+      Alert.alert("Error", "Failed to logout. Please try again.");
+      console.error("Logout failed:", error);
+    } finally {
+      setIsLoading(false);
     }
   };
+
+  const getInitials = (name: string) => {
+    return name
+      .split(" ")
+      .map((n) => n[0])
+      .join("")
+      .toUpperCase();
+  };
+
+  if (!user) return null;
 
   return (
     <ScrollView className="flex-1 bg-gray-50">
       {/* Profile Section */}
       <View className="bg-white p-4 mb-6">
         <View className="flex-row items-center">
-          <View className="w-16 h-16 rounded-full bg-gray-200 items-center justify-center">
-            <MaterialIcons name="person" size={32} color="#0C8EEC" />
+          <View className="w-16 h-16 rounded-full bg-[#0C8EEC] items-center justify-center">
+            <Text className="text-white text-xl font-bold">
+              {getInitials(user.fullName)}
+            </Text>
           </View>
-          <View className="ml-4">
-            <Text className="text-xl font-bold text-gray-800">{user?.fullName}</Text>
-            <Text className="text-gray-500">{user?.email}</Text>
+          <View className="ml-4 flex-1">
+            <Text className="text-xl font-bold text-gray-800">
+              {user.fullName}
+            </Text>
+            <Text className="text-gray-500">{user.email}</Text>
+            {user.phone && (
+              <Text className="text-gray-500 text-sm">{user.phone}</Text>
+            )}
           </View>
         </View>
       </View>
 
       {/* Settings Groups */}
       <View className="mb-6">
-        <Text className="px-4 pb-2 text-sm font-medium text-gray-500">PENGATURAN AKUN</Text>
         <SettingsItem
           icon="person-outline"
           title="Edit Profil"
-          onPress={() => console.log('Navigate to profile edit')}
+          onPress={() => router.push("/(settings)/edit-profile")}
         />
         <SettingsItem
           icon="lock-closed-outline"
           title="Ubah Password"
-          onPress={() => console.log('Navigate to change password')}
+          onPress={() => router.push("/(settings)/change-password")}
         />
       </View>
 
       <View className="mb-6">
-        <Text className="px-4 pb-2 text-sm font-medium text-gray-500">TENTANG APLIKASI</Text>
+        <Text className="px-4 pb-2 text-sm font-medium text-gray-500">
+          TENTANG APLIKASI
+        </Text>
         <SettingsItem
           icon="information-circle-outline"
           title="Tentang Kami"
-          onPress={() => console.log('Navigate to about')}
+          subtitle="Versi 1.0.0"
+          onPress={() => router.push("../(settings)/about")}
         />
         <SettingsItem
           icon="help-circle-outline"
           title="Bantuan"
-          onPress={() => console.log('Navigate to help')}
+          onPress={() => router.push("../(settings)/help")}
         />
         <SettingsItem
           icon="shield-checkmark-outline"
           title="Kebijakan Privasi"
-          onPress={() => console.log('Navigate to privacy policy')}
+          onPress={() => router.push("../(settings)/privacy-policy")}
         />
       </View>
 
@@ -111,7 +144,10 @@ export default function SettingsScreen() {
 
       {/* Logout Confirmation Dialog */}
       <Portal>
-        <Dialog visible={showLogoutDialog} onDismiss={() => setShowLogoutDialog(false)}>
+        <Dialog
+          visible={showLogoutDialog}
+          onDismiss={() => setShowLogoutDialog(false)}
+        >
           <Dialog.Title>Konfirmasi Keluar</Dialog.Title>
           <Dialog.Content>
             <Text className="text-gray-600">
@@ -119,8 +155,19 @@ export default function SettingsScreen() {
             </Text>
           </Dialog.Content>
           <Dialog.Actions>
-            <Button onPress={() => setShowLogoutDialog(false)}>Batal</Button>
-            <Button onPress={handleLogout} textColor="#DC2626">Keluar</Button>
+            <Button
+              onPress={() => setShowLogoutDialog(false)}
+              disabled={isLoading}
+            >
+              Batal
+            </Button>
+            <Button
+              onPress={handleLogout}
+              loading={isLoading}
+              textColor="#DC2626"
+            >
+              Keluar
+            </Button>
           </Dialog.Actions>
         </Dialog>
       </Portal>

@@ -1,45 +1,57 @@
 // app/(tabs)/home.tsx
-import React from 'react';
-import { Text, SafeAreaView, View, TouchableOpacity, ScrollView } from 'react-native';
-import { useAuth } from '@/context/AuthContext';
-import { MaterialIcons, Ionicons } from '@expo/vector-icons';
+import React from "react";
+import {
+  Text,
+  SafeAreaView,
+  View,
+  TouchableOpacity,
+  ScrollView,
+} from "react-native";
+import { useAuth } from "@/context/AuthContext";
+import { MaterialIcons, Ionicons } from "@expo/vector-icons";
+import { router } from "expo-router";
 
 type MenuItem = {
   title: string;
   description: string;
   icon: keyof typeof Ionicons.glyphMap;
   color: string;
-}
+};
 
 export default function HomeScreen() {
   const { user } = useAuth();
 
   const menuItems: MenuItem[] = [
     {
-      title: 'Pembelajaran',
-      description: 'Akses materi pembelajaran IT',
-      icon: 'book-outline',
-      color: '#0C8EEC'
+      title: "Pembelajaran",
+      description: "Akses materi pembelajaran IT",
+      icon: "book-outline",
+      color: "#0C8EEC",
     },
     {
-      title: 'Quiz',
-      description: 'Uji pemahaman materi',
-      icon: 'help-circle-outline',
-      color: '#A92394'
+      title: "Quiz",
+      description: "Uji pemahaman materi",
+      icon: "help-circle-outline",
+      color: "#A92394",
     },
     {
-      title: 'Diskusi',
-      description: 'Forum tanya jawab',
-      icon: 'chatbubbles-outline',
-      color: '#2E8B57'
+      title: "Diskusi",
+      description: "Forum tanya jawab",
+      icon: "chatbubbles-outline",
+      color: "#2E8B57",
     },
     {
-      title: 'Progress',
-      description: 'Pantau perkembangan belajar',
-      icon: 'stats-chart-outline',
-      color: '#FF8C00'
-    }
+      title: "Progress",
+      description: "Pantau perkembangan belajar",
+      icon: "stats-chart-outline",
+      color: "#FF8C00",
+    },
   ] as const;
+
+  if (!user) {
+    router.replace("/(auth)/login");
+    return null;
+  }
 
   return (
     <ScrollView className="flex-1 bg-gray-50">
@@ -47,7 +59,10 @@ export default function HomeScreen() {
       <SafeAreaView className="bg-white">
         <View className="p-4 border-b border-gray-100">
           <Text className="text-gray-600 text-base">Selamat datang,</Text>
-          <Text className="text-xl font-bold text-gray-800">{user?.fullName}</Text>
+          <Text className="text-xl font-bold text-gray-800">
+            {user.fullName}
+          </Text>
+          <Text className="text-sm text-gray-500">{user.email}</Text>
         </View>
       </SafeAreaView>
 
@@ -74,9 +89,12 @@ export default function HomeScreen() {
             <TouchableOpacity
               key={index}
               className="bg-white w-[48%] rounded-xl p-4 mb-4 shadow-sm"
-              onPress={() => console.log(`Navigate to ${item.title}`)}
+              activeOpacity={0.7}
             >
-              <View style={{ backgroundColor: `${item.color}20` }} className="w-12 h-12 rounded-full items-center justify-center mb-3">
+              <View
+                style={{ backgroundColor: `${item.color}20` }}
+                className="w-12 h-12 rounded-full items-center justify-center mb-3"
+              >
                 <Ionicons name={item.icon} size={24} color={item.color} />
               </View>
               <Text className="font-bold text-gray-800 mb-1">{item.title}</Text>

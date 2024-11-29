@@ -13,35 +13,35 @@ export interface MenuItem {
 
 export const MAIN_MENU_ITEMS: MenuItem[] = [
   {
-    id: "learn",
-    title: "Materi",
-    description: "Akses pembelajaran IT",
-    icon: "book-outline",
-    color: "#0C8EEC",
-    route: "/learning",
+    id: 'materi',
+    title: 'Pembelajaran',
+    description: 'Akses materi pembelajaran IT',
+    icon: 'book-outline',
+    color: '#0C8EEC',
+    route: '/(materi)'
   },
   {
-    id: "subject-quiz",
-    title: "Quiz Materi",
-    description: "Latihan per materi",
-    icon: "school-outline",
-    color: "#0C8EEC",
-    route: "/subject-quiz",
+    id: 'quiz',
+    title: 'Quiz',
+    description: 'Uji pemahaman materi',
+    icon: 'help-circle-outline',
+    color: '#A92394',
+    route: '/(quiz)'
   },
   {
-    id: "weekly-quiz",
-    title: "Quiz Mingguan",
-    description: "Tantangan mingguan",
-    icon: "trophy-outline",
-    color: "#0C8EEC",
-    route: "/weekly-quiz",
+    id: 'diskusi',
+    title: 'Diskusi',
+    description: 'Forum tanya jawab',
+    icon: 'chatbubbles-outline',
+    color: '#2E8B57',
+    route: '/(diskusi)'
   },
   {
-    id: "progress",
-    title: "Progress",
-    description: "Pantau pembelajaran",
-    icon: "trending-up-outline",
-    color: "#0C8EEC",
-    route: "/progress",
-  },
+    id: 'progress',
+    title: 'Progress',
+    description: 'Pantau perkembangan belajar',
+    icon: 'stats-chart-outline',
+    color: '#FF8C00',
+    route: '/(progress)'
+  }
 ];

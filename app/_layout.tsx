@@ -7,13 +7,12 @@ import { useEffect } from 'react';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { PaperProvider, MD3LightTheme } from 'react-native-paper';
 import { useColorScheme } from '@/hooks/useColorScheme';
+import { NavigationContainer } from '@react-navigation/native';
 import "../global.css";
 import { AuthProvider } from '@/context/AuthContext';
 
-// Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
 
-// Custom theme untuk react-native-paper
 const theme = {
   ...MD3LightTheme,
   colors: {
@@ -42,9 +41,11 @@ export default function RootLayout() {
     <SafeAreaProvider>
       <PaperProvider theme={theme}>
         <AuthProvider>
-          <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+          <NavigationContainer 
+            theme={colorScheme === 'dark' ? DarkTheme : DefaultTheme}
+          >
             <Stack screenOptions={{ headerShown: false }} />
-          </ThemeProvider>
+          </NavigationContainer>
         </AuthProvider>
       </PaperProvider>
     </SafeAreaProvider>

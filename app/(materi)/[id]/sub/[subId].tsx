@@ -8,6 +8,7 @@ import Animated, { FadeIn } from 'react-native-reanimated';
 import { materiService } from '@/services/materiService';
 import { SubMateri } from '@/types/materi';
 import { ErrorView } from '@/components/commons/ErrorView';
+import { cleanHtml } from '@/lib/stringUtils';
 
 export default function SubMateriDetailScreen() {
   const { id, subId } = useLocalSearchParams<{ id: string; subId: string }>();
@@ -69,7 +70,7 @@ export default function SubMateriDetailScreen() {
         </Text>
 
         <Text className="text-gray-600 text-base leading-6 mb-6">
-          {subMateri.konten}
+          {cleanHtml(subMateri.konten)}
         </Text>
 
         {subMateri.imageUrls.map((imageUrl, index) => (

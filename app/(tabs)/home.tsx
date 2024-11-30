@@ -35,7 +35,7 @@ const MAIN_MENU_ITEMS: MenuItem[] = [
   {
     id: "pembelajaran",
     title: "Pembelajaran",
-    description: "Akses materi pembelajaran IT",
+    description: "Akses materi pembelajaran",
     icon: "book-outline",
     color: "#0C8EEC",
     route: "/(materi)"
@@ -49,19 +49,11 @@ const MAIN_MENU_ITEMS: MenuItem[] = [
     route: "/(quiz)"
   },
   {
-    id: "diskusi",
-    title: "Diskusi",
-    description: "Forum tanya jawab",
-    icon: "chatbubbles-outline",
-    color: "#2E8B57",
-    route: "/diskusi"
-  },
-  {
     id: "papan-skor",
     title: "Papan Skor",
-    description: "Lihat peringkat nilai quiz",
-    icon: "trophy-outline", // Ganti icon menjadi trophy
-    color: "#FFD700", // Warna gold untuk trophy
+    description: "Lihat Nilai",
+    icon: "trophy-outline", 
+    color: "#FFD700", 
     route: "/(papan_skor)"
   }
 ];

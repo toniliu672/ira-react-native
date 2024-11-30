@@ -20,10 +20,53 @@ import Animated, {
   LinearTransition,
 } from "react-native-reanimated";
 import { getGreeting } from "@/lib/dateTimes";
-import { MAIN_MENU_ITEMS, MenuItem } from "@/constants/menuItems";
 
-const AnimatedTouchableOpacity =
-  Animated.createAnimatedComponent(TouchableOpacity);
+type MenuItem = {
+  id: string;
+  title: string;
+  description: string;
+  icon: keyof typeof Ionicons.glyphMap;
+  color: string;
+  route: string;
+  badge?: string;
+};
+
+const MAIN_MENU_ITEMS: MenuItem[] = [
+  {
+    id: "pembelajaran",
+    title: "Pembelajaran",
+    description: "Akses materi pembelajaran IT",
+    icon: "book-outline",
+    color: "#0C8EEC",
+    route: "/(materi)"
+  },
+  {
+    id: "quiz",
+    title: "Quiz",
+    description: "Uji pemahaman materi",
+    icon: "help-circle-outline",
+    color: "#A92394",
+    route: "/(quiz)"
+  },
+  {
+    id: "diskusi",
+    title: "Diskusi",
+    description: "Forum tanya jawab",
+    icon: "chatbubbles-outline",
+    color: "#2E8B57",
+    route: "/diskusi"
+  },
+  {
+    id: "papan-skor",
+    title: "Papan Skor",
+    description: "Lihat peringkat nilai quiz",
+    icon: "trophy-outline", // Ganti icon menjadi trophy
+    color: "#FFD700", // Warna gold untuk trophy
+    route: "/(papan_skor)"
+  }
+];
+
+const AnimatedTouchableOpacity = Animated.createAnimatedComponent(TouchableOpacity);
 
 export default function HomeScreen() {
   const { user } = useAuth();

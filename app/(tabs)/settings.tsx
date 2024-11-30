@@ -86,11 +86,7 @@ export default function SettingsScreen() {
   return (
     <ScrollView className="flex-1 bg-gray-50">
       {/* Profile Section */}
-      <TouchableOpacity
-        onPress={() => router.push("/(profil)")}
-        activeOpacity={0.7}
-        className="bg-white p-4 mb-6"
-      >
+      <View className="bg-white p-4 mb-6">
         <View className="flex-row items-center">
           <View className="w-16 h-16 rounded-full bg-[#0C8EEC] items-center justify-center">
             <Text className="text-white text-xl font-bold">
@@ -106,9 +102,8 @@ export default function SettingsScreen() {
               <Text className="text-gray-500 text-sm">{user.phone}</Text>
             )}
           </View>
-          <MaterialIcons name="chevron-right" size={24} color="#CBD5E1" />
         </View>
-      </TouchableOpacity>
+      </View>
 
       {/* Settings Groups */}
       <View className="mb-6">

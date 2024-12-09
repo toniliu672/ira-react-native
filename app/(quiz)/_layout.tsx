@@ -1,6 +1,5 @@
 // app/(quiz)/_layout.tsx
 import { Stack } from 'expo-router';
-import { MaterialIcons } from '@expo/vector-icons';
 
 export default function QuizLayout() {
   return (
@@ -10,34 +9,24 @@ export default function QuizLayout() {
           backgroundColor: 'white',
         },
         headerTintColor: '#0C8EEC',
-        headerTitleStyle: {
-          fontWeight: 'bold',
-        },
         headerTitleAlign: 'center',
-        headerShadowVisible: false,
-        animation: 'slide_from_right',
       }}
     >
-      <Stack.Screen
-        name="index"
-        options={{
-          title: 'Quiz',
-        }}
+      <Stack.Screen 
+        name="index" 
+        options={{ title: 'Quiz' }} 
       />
-      <Stack.Screen
-        name="[id]"
-        options={{
-          title: 'Quiz Detail',
-          headerBackTitle: 'Kembali',
-          presentation: 'modal',
-        }}
+      <Stack.Screen 
+        name="quiz-list" 
+        options={{ title: 'Pilih Quiz' }} 
       />
-      <Stack.Screen
-        name="results"
-        options={{
-          title: 'Hasil Quiz',
-          headerBackTitle: 'Kembali',
-        }}
+      <Stack.Screen 
+        name="multiple-choice/[id]" 
+        options={{ title: 'Quiz Pilihan Ganda' }} 
+      />
+      <Stack.Screen 
+        name="essay/[id]" 
+        options={{ title: 'Quiz Essay' }} 
       />
     </Stack>
   );

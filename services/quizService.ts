@@ -28,6 +28,7 @@ class QuizService {
 
   async getQuizDetail(quizId: string): Promise<APIResponse<QuizDetail>> {
     try {
+      // Pastikan endpoint sesuai dengan API docs
       const response = await api.get<APIResponse<QuizDetail>>(
         `/quiz/${quizId}`
       );
@@ -85,9 +86,20 @@ class QuizService {
         "/quiz/scores/user",
         { params }
       );
+
+      // Format waktu sebelum mengembalikan response
+      if (response.data.success && response.data.data?.scores) {
+        response.data.data.scores = response.data.data.scores.map((score) => ({
+          ...score,
+          progress: {
+            ...score.progress,
+            lastSubmitted: this.formatDate(score.progress.lastSubmitted),
+          },
+        }));
+      }
+
       return response.data;
     } catch (error) {
-      // Jika 404, kembalikan response sukses dengan array kosong
       if (axios.isAxiosError(error) && error.response?.status === 404) {
         return {
           success: true,
@@ -99,6 +111,19 @@ class QuizService {
     }
   }
 
+  // Tambahkan helper method untuk format tanggal
+  private formatDate(dateString: string): string {
+    try {
+      const date = new Date(dateString);
+      return date.toLocaleDateString("id-ID", {
+        day: "numeric",
+        month: "long",
+        year: "numeric",
+      });
+    } catch {
+      return dateString; // Fallback ke format asli jika parsing gagal
+    }
+  }
   async getQuizResultDetail(
     quizId: string
   ): Promise<APIResponse<QuizResultDetail>> {

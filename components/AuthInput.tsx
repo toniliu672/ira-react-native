@@ -8,6 +8,7 @@ interface AuthInputProps extends TextInputProps {
   placeholder: string;
   value: string;
   onChangeText: (text: string) => void;
+  error?: boolean;
 }
 
 export default function AuthInput({ 

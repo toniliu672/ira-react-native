@@ -24,7 +24,7 @@ export default function AboutScreen() {
               className="w-24 h-24 rounded-xl mb-4"
               resizeMode="contain"
             />
-            <Text className="text-2xl font-bold text-gray-800">IRA App v1.0.0</Text>
+            <Text className="text-2xl font-bold text-gray-800">IRA App v1.1.0</Text>
             <Text className="text-base text-gray-500 mt-2 text-center">
               Media Pembelajaran Dinamis & Fleksibel
             </Text>

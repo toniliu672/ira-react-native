@@ -31,6 +31,7 @@ type MenuItem = {
   badge?: string;
 };
 
+// app/(tabs)/home.tsx
 const MAIN_MENU_ITEMS: MenuItem[] = [
   {
     id: "pembelajaran",
@@ -55,9 +56,16 @@ const MAIN_MENU_ITEMS: MenuItem[] = [
     icon: "trophy-outline", 
     color: "#FFD700", 
     route: "/(papan_skor)"
+  },
+  {
+    id: "ranking",
+    title: "Ranking",
+    description: "Lihat peringkat per quiz",
+    icon: "podium-outline",
+    color: "#22C55E",
+    route: "/(ranking)"
   }
 ];
-
 const AnimatedTouchableOpacity = Animated.createAnimatedComponent(TouchableOpacity);
 
 export default function HomeScreen() {

@@ -14,14 +14,18 @@ export default function PapanSkorLayout() {
         },
         headerTitleAlign: 'center',
         headerShadowVisible: false,
-        animation: 'slide_from_right',
       }}
     >
       <Stack.Screen
         name="index"
         options={{
-          title: 'Papan Skor',
-          headerBackTitle: 'Kembali',
+          title: 'Pilih Materi',
+        }}
+      />
+      <Stack.Screen
+        name="[id]"
+        options={{
+          title: 'Hasil Quiz',
         }}
       />
     </Stack>

@@ -39,6 +39,10 @@ export default function RankingScreen() {
   useFocusEffect(
     useCallback(() => {
       fetchRanking();
+
+      // Auto refresh setiap 30 detik
+      const intervalId = setInterval(fetchRanking, 30000);
+      return () => clearInterval(intervalId);
     }, [quizId])
   );
 
@@ -66,7 +70,6 @@ export default function RankingScreen() {
         `}
       >
         <View className="flex-row items-center">
-          {/* Rank Number/Icon */}
           <View
             className={`
               w-8 h-8 rounded-full items-center justify-center mr-3
@@ -80,7 +83,6 @@ export default function RankingScreen() {
             )}
           </View>
 
-          {/* User Info */}
           <View className="flex-1">
             <Text
               className={`font-bold ${
@@ -92,14 +94,13 @@ export default function RankingScreen() {
             <Text className="text-gray-500 text-sm">{item.lastSubmitted}</Text>
           </View>
 
-          {/* Score */}
           <Text
             className={`
               text-lg font-bold
               ${isTop3 ? "text-yellow-500" : "text-gray-800"}
             `}
           >
-            {item.score.toFixed(1)}
+            {(item.score * 100).toFixed(0)}
           </Text>
         </View>
       </Animated.View>
@@ -134,54 +135,27 @@ export default function RankingScreen() {
 
   return (
     <View className="flex-1 bg-gray-50">
-      {/* User's Position Summary */}
       <View className="bg-white p-4 mb-4">
         <Text className="text-center text-gray-500 mb-2">Peringkat Kamu</Text>
         <Text className="text-center text-3xl font-bold text-[#0C8EEC]">
-          {ranking.user?.rank || "-"}
+          {ranking.user.rank}
         </Text>
         <Text className="text-center text-gray-500 mt-2">
-          Nilai: {((ranking.user?.score || 0) * 100).toFixed(0)}
+          Nilai: {(ranking.user.score * 100).toFixed(0)}
         </Text>
       </View>
 
       <FlatList
         data={ranking.rankings}
-        renderItem={({ item }) => (
-          <View
-            className={`
-            mx-4 mb-3 p-4 rounded-xl
-            ${
-              item.isYou ? "bg-[#0C8EEC15] border border-[#0C8EEC]" : "bg-white"
-            }
-          `}
-          >
-            <View className="flex-row items-center">
-              <View className="w-8 h-8 rounded-full items-center justify-center mr-3 bg-gray-100">
-                <Text className="font-bold text-gray-600">{item.rank}</Text>
-              </View>
-              <View className="flex-1">
-                <Text
-                  className={
-                    item.isYou ? "text-[#0C8EEC] font-bold" : "text-gray-800"
-                  }
-                >
-                  {item.name}
-                </Text>
-                <Text className="text-gray-500 text-sm">
-                  {item.lastSubmitted}
-                </Text>
-              </View>
-              <Text className="text-lg font-bold text-gray-800">
-                {(item.score * 100).toFixed(0)}{" "}
-              </Text>
-            </View>
-          </View>
-        )}
+        renderItem={renderRankItem}
         keyExtractor={(item) => item.username}
         contentContainerStyle={{ paddingVertical: 16 }}
         refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            colors={["#0C8EEC"]}
+          />
         }
       />
     </View>

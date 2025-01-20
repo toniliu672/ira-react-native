@@ -42,7 +42,8 @@ export interface ApiResponse<T> {
     id: string;
     judul: string;
     deskripsi: string;
-    videoUrl: string;
+    videoUrl: string;  
+    youtubeId: string; 
     thumbnailUrl: string;
     durasi: number;
     urutan: number;

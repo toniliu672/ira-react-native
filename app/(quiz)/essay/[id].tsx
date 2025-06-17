@@ -8,6 +8,7 @@ import Animated, { FadeInDown } from 'react-native-reanimated';
 import { quizService } from '@/services/quizService';
 import { QuizDetail } from '@/types/quiz';
 import { ErrorView } from '@/components/commons/ErrorView';
+import { useQuiz } from '@/context/QuizContext';
 
 export default function EssayQuizScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -17,6 +18,8 @@ export default function EssayQuizScreen() {
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const { setLastCompletedQuiz } = useQuiz();
 
   // Handle back button
   useEffect(() => {
@@ -117,9 +120,20 @@ export default function EssayQuizScreen() {
         }
       }
 
+      // Set quiz yang baru selesai untuk tracking di papan skor
+      setLastCompletedQuiz({
+        materiId: quizDetail.quiz.materiId,
+        quizId: quizDetail.quiz.id,
+        type: 'ESSAY'
+      });
+
+      // Redirect ke halaman hasil essay
       router.replace({
-        pathname: "./(quiz)/results",
-        params: { id: quizDetail.quiz.id }
+        pathname: "/(quiz)/essay/result",
+        params: { 
+          id: quizDetail.quiz.id,
+          title: quizDetail.quiz.judul
+        }
       });
 
     } catch (err) {
@@ -141,7 +155,7 @@ export default function EssayQuizScreen() {
   }
 
   if (error) {
-    return <ErrorView message={error} />;
+    return <ErrorView message={error} onRetry={() => window.location.reload()} />;
   }
 
   if (!quizDetail?.questions) return null;

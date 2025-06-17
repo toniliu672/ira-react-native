@@ -126,7 +126,7 @@ export default function SettingsScreen() {
         <SettingsItem
           icon="information-circle-outline"
           title="Tentang Kami"
-          subtitle="Versi 1.2.0"
+          subtitle="Versi 2.0"
           onPress={() => router.push("../(settings)/about")}
         />
         <SettingsItem

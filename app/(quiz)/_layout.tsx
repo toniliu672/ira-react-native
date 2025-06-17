@@ -28,6 +28,10 @@ export default function QuizLayout() {
         name="essay/[id]" 
         options={{ title: 'Quiz Essay' }} 
       />
+      <Stack.Screen 
+        name="essay/result" 
+        options={{ title: 'Quiz Selesai' }} 
+      />
     </Stack>
   );
 }
